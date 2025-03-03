@@ -7,4 +7,7 @@ public class GreetingService {
     public String getSimpleGreeting() {
         return "Hello World!";
     }
+    public String getSimpleGreeting(String firstname, String lastname) {
+        return "Hello " + firstname + " " + lastname +"!";
+    }
 }

@@ -1,6 +1,7 @@
 package com.aditya.GreetingApp.Controller;
 
 import com.aditya.GreetingApp.CustomException.ResourceNotFoundException;
+import com.aditya.GreetingApp.Services.GreetingService;
 import com.aditya.GreetingApp.model.Greeting;
 import com.aditya.GreetingApp.Repository.GreetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class GreetingController {
 
     @Autowired
     private GreetingRepository greetingRepository;
+    @Autowired
+    private GreetingService greetingService;
 
     @GetMapping
     public List<Greeting> getGreetings(){
@@ -40,5 +43,16 @@ public class GreetingController {
     @DeleteMapping("/{id}")
     public void deleteGreeting(@PathVariable Long id){
         greetingRepository.deleteById(id);
+    }
+    @Autowired
+    private GreetingService simpleGreet;
+    @GetMapping("/simple")
+    public String getSimpleGreeting(){
+        return simpleGreet.getSimpleGreeting();
+    }
+    @GetMapping("/message")
+    public String getGreetingMessage(@RequestParam(required = false) String firstName,
+                                     @RequestParam(required = false) String lastName){
+        return greetingService.getSimpleGreeting(firstName, lastName);
     }
 }
