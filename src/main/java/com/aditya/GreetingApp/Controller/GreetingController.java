@@ -6,7 +6,6 @@ import com.aditya.GreetingApp.Repository.GreetingRepository;
 import com.aditya.GreetingApp.Services.GreetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @RestController
@@ -45,12 +44,16 @@ public class GreetingController {
         return simplegreet.getSimpleGreet(firstname,lastname);
     }
     @PostMapping("/save")
-    public String saveGreeting(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname){
-        return greetingService.getSimpleGreet(firstname, lastname);
+    public Greeting saveGreeting(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname){
+        return greetingService.saveGreeting(firstname, lastname);
     }
     @GetMapping("getId/{id}")
     public Greeting getGreetingById(@PathVariable Long id){
         return greetingService.getGreetById(id);
+    }
+    @GetMapping("/getAll")
+    public List<Greeting> getAllGreetings(){
+        return greetingService.getAllGreetings();
     }
 
 }
