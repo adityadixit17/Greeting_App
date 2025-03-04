@@ -55,5 +55,8 @@ public class GreetingController {
     public List<Greeting> getAllGreetings(){
         return greetingService.getAllGreetings();
     }
-
+    @PutMapping("/updateRepo/{id}")
+    public Greeting updateGreetingRepo(@PathVariable Long id, @RequestBody Greeting greetingDetails){
+        return greetingService.updateGreeting(id, greetingDetails.getMessage());
+    }
 }
