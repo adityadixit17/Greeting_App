@@ -55,4 +55,8 @@ public class GreetingController {
                                      @RequestParam(required = false) String lastName){
         return greetingService.getSimpleGreeting(firstName, lastName);
     }
+    @PostMapping("/save")
+    public String saveGreeting(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname){
+        return greetingService.getSimpleGreeting(firstname, lastname);
+    }
 }
