@@ -1,62 +1,56 @@
 package com.aditya.GreetingApp.Controller;
 
 import com.aditya.GreetingApp.CustomException.ResourceNotFoundException;
-import com.aditya.GreetingApp.Services.GreetingService;
 import com.aditya.GreetingApp.model.Greeting;
 import com.aditya.GreetingApp.Repository.GreetingRepository;
+import com.aditya.GreetingApp.Services.GreetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 @RestController
-@RequestMapping("/greetings")
+@RequestMapping("/greeting")
 public class GreetingController {
-
-    private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
-
     @Autowired
-    private GreetingRepository greetingRepository;
+    private GreetingRepository greetingRepo;
     @Autowired
     private GreetingService greetingService;
-
     @GetMapping
     public List<Greeting> getGreetings(){
-        return greetingRepository.findAll();
+        return greetingRepo.findAll();
     }
-
     @PostMapping
-    public Greeting createGreeting(@RequestBody Greeting greeting){
-        logger.info("Received Greeting: " + greeting);
-        return greetingRepository.save(greeting);
+    public Greeting createGreeting(@RequestBody Greeting greet){
+        return greetingRepo.save(greet);
     }
-
-    @PutMapping("/{id}")
-    public Greeting updateGreeting(@PathVariable Long id, @RequestBody Greeting greetingDetails){
-        logger.info("Updating Greeting with ID: " + id);
-        Greeting greeting = greetingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Greeting not found with id " + id));
-        greeting.setMessage(greetingDetails.getMessage());
-        return greetingRepository.save(greeting);
+    @PutMapping("/id")
+    public Greeting updateGreeting(@PathVariable Long ID, @RequestBody Greeting greet){;
+        Greeting greeting=greetingRepo.findById(ID).orElseThrow(()-> new ResourceNotFoundException("Greeting not found with ID: "+ID));
+        greeting.setMessage(greet.getMessage());
+        return greetingRepo.save(greet);
     }
-
     @DeleteMapping("/{id}")
-    public void deleteGreeting(@PathVariable Long id){
-        greetingRepository.deleteById(id);
+    public void deleteGreeting(@PathVariable Long ID){
+        greetingRepo.deleteById(ID);
     }
     @Autowired
-    private GreetingService simpleGreet;
+    private GreetingService simplegreet;
     @GetMapping("/simple")
-    public String getSimpleGreeting(){
-        return simpleGreet.getSimpleGreeting();
+    public String getSimpleGreet(){
+        return simplegreet.getSimpleGreet();
     }
     @GetMapping("/message")
-    public String getGreetingMessage(@RequestParam(required = false) String firstName,
-                                     @RequestParam(required = false) String lastName){
-        return greetingService.getSimpleGreeting(firstName, lastName);
+    public String getSimpleGreetWithName(@RequestParam(required=false) String firstname, @RequestParam(required = false) String lastname){
+        return simplegreet.getSimpleGreet(firstname,lastname);
     }
     @PostMapping("/save")
     public String saveGreeting(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname){
-        return greetingService.getSimpleGreeting(firstname, lastname);
+        return greetingService.getSimpleGreet(firstname, lastname);
     }
+    @GetMapping("getId/{id}")
+    public Greeting getGreetingById(@PathVariable Long id){
+        return greetingService.getGreetById(id);
+    }
+
 }

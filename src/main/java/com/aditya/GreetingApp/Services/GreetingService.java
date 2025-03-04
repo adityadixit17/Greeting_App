@@ -5,14 +5,13 @@ import com.aditya.GreetingApp.model.Greeting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
 public class GreetingService {
     @Autowired
     GreetingRepository greetingRepository;
-    public String getSimpleGreeting() {
-        return "Hello World!";
+    public String getSimpleGreet(){
+        return "Hello World";
     }
-    public String getSimpleGreeting(String firstName, String lastName) {
+    public String getSimpleGreet(String firstName, String lastName){
         if(firstName != null && lastName != null) {
             return "Hello " + firstName + " " + lastName;
         } else if (firstName != null) {
@@ -40,4 +39,8 @@ public class GreetingService {
         Greeting greeting = new Greeting(message);
         return greetingRepository.save(greeting);
     }
+    public Greeting getGreetById(Long id) {
+        return greetingRepository.findById(id).orElseThrow(()->new RuntimeException("Greeting not found with id: " + id));
+    }
+
 }

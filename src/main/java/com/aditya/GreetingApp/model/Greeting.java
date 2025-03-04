@@ -13,7 +13,7 @@ public class Greeting {
     private String message;
 
     public Greeting(String message) {
-        this.message = message;
+        this.message=message;
     }
 
     public Greeting(Long id, String message) {
