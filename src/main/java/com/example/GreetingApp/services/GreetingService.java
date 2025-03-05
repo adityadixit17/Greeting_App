@@ -1,4 +1,4 @@
-package com.example.GreetingApp.service;
+package com.example.GreetingApp.services;
 
 import com.example.GreetingApp.model.Greeting;
 import com.example.GreetingApp.repository.GreetingRepository;
