@@ -1,15 +1,12 @@
 package com.example.GreetingApp.services;
 
-
 import com.example.GreetingApp.Exception.UserException;
-import com.example.GreetingApp.dto.AuthUserDTO;
-import com.example.GreetingApp.dto.LoginDTO;
+import com.example.GreetingApp.dto.*;
+import com.example.GreetingApp.interfaces.IAuthenticationService;
 import com.example.GreetingApp.model.AuthUser;
 import com.example.GreetingApp.repository.AuthUserRepository;
 import com.example.GreetingApp.utility.JwtToken;
-import jdk.jshell.spi.ExecutionControl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,45 +14,58 @@ import java.util.Optional;
 
 @Service
 public class AuthenticationService implements IAuthenticationService {
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @Autowired
     AuthUserRepository authUserRepository;
-
     @Autowired
     EmailSenderService emailSenderService;
-
     @Autowired
     JwtToken tokenUtil;
 
     @Override
-    public AuthUser register(AuthUserDTO userDTO) throws Exception{
-
-        String hashedPassword=encoder.encode(userDTO.getPassword());
-        AuthUser user=new AuthUser(userDTO);
+    public AuthUser register(AuthUserDTO userDTO) throws Exception {
+        String hashedPassword = encoder.encode(userDTO.getPassword());
+        AuthUser user = new AuthUser(userDTO);
         user.setPassword(hashedPassword);
         authUserRepository.save(user);
-        String token=tokenUtil.createToken(user.getUserId());
 
-        emailSenderService.sendEmail(user.getEmail(),"Registered in Greeting App", "Hii...."
-                +user.getFirstName()+"\n You have been successfully registered!\n\n Your registered details are:\n\n User Id:  "
-                +user.getUserId()+"\n First Name:  "
-                +user.getFirstName()+"\n Last Name:  "
-                +user.getLastName()+"\n Email:  "
-                +user.getEmail()+"\n Address:  "
-                +"\n Token:  " +token);
+        String token = tokenUtil.createToken(user.getUserId());
+        emailSenderService.sendEmail(user.getEmail(), "Registered in Greeting App",
+                "Hi " + user.getFirstName() + ",\n\nYou have been successfully registered!"
+                        + "\nUser Id: " + user.getUserId()
+                        + "\nEmail: " + user.getEmail()
+                        + "\nToken: " + token);
+
         return user;
     }
 
     @Override
-    public String login(LoginDTO loginDTO){
+    public String login(LoginDTO loginDTO) {
+        Optional<AuthUser> user = Optional.ofNullable(authUserRepository.findByEmail(loginDTO.getEmail()));
 
-        Optional<AuthUser> user= Optional.ofNullable(authUserRepository.findByEmail(loginDTO.getEmail()));
-        if (user.isPresent() && encoder.matches(loginDTO.getPassword(),user.get().getPassword())){
-            emailSenderService.sendEmail(user.get().getEmail(),"Logged in Successfully!", "Hii...."+user.get().getFirstName()+"\n\n You have successfully logged in into Greeting App!");
-            return "Congratulations!! You have logged in successfully!";
-        }else {
-            throw new UserException("Sorry! Email or Password is incorrect!");
+        if (user.isPresent() && encoder.matches(loginDTO.getPassword(), user.get().getPassword())) {
+            emailSenderService.sendEmail(user.get().getEmail(), "Login Successful",
+                    "Hi " + user.get().getFirstName() + ",\n\nYou have successfully logged in.");
+            return "Login successful!";
+        } else {
+            throw new UserException("Invalid email or password!");
         }
+    }
+
+    @Override
+    public String forgotPassword(String email, String newPassword) {
+        AuthUser user = authUserRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserException("User not found: " + email);
+        }
+
+        user.setPassword(encoder.encode(newPassword));
+        authUserRepository.save(user);
+
+        emailSenderService.sendEmail(user.getEmail(), "Password Reset Successful",
+                "Hi " + user.getFirstName() + ",\n\nYour password has been successfully changed!");
+
+        return "Password changed successfully!";
     }
 }
